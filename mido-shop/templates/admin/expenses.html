@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>المصاريف</h2><a class="btn s o" href="{{ url_for('admin.export_expenses') }}">تصدير Excel</a></div>
+<p class="mut">سجل هنا إعلانات، تغليف، مواصلات، أي مصروف عشان يتخصم من الربح في التحليلات.</p>
+<form method="post" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}">
+<div class="g3"><label>البند<input name="title" required></label><label>المبلغ<input name="amount" type="number" min="0" required></label><label>التاريخ<input name="date" type="date" value="{{ today }}" required></label></div>
+<button class="btn">إضافة</button></form>
+<div class="card scroll"><table><tr><th>التاريخ</th><th>البند</th><th>المبلغ</th><th></th></tr>
+{% for e in items %}<tr><td>{{ e.date }}</td><td>{{ e.title }}</td><td>{{ e.amount|money }}</td>
+<td><form method="post" action="{{ url_for('admin.expense_delete', eid=e.id) }}" onsubmit="return confirm('مسح؟')"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="ghost">مسح</button></form></td></tr>
+{% else %}<tr><td colspan="4" class="mut">مفيش مصاريف.</td></tr>{% endfor %}</table></div>
+{% endblock %}

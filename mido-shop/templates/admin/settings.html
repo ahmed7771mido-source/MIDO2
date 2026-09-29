@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2>إعدادات الموقع</h2>
+<form method="post" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}">
+<h3>الهوية والنصوص</h3>
+<div class="g3"><label>اسم البراند<input name="site_name" value="{{ S.site_name }}"></label><label>الشعار النصي<input name="tagline" value="{{ S.tagline }}"></label><label>شريط الإعلان (فاضي = مخفي)<input name="announcement" value="{{ S.announcement }}"></label></div>
+<label>عنوان الصفحة الرئيسية<input name="hero_title" value="{{ S.hero_title }}"></label>
+<label>نص تحت العنوان<textarea name="hero_text" rows="2">{{ S.hero_text }}</textarea></label>
+<label>نص "عن البراند"<textarea name="about_text" rows="3">{{ S.about_text }}</textarea></label>
+<label>العنوان في الفوتر<input name="footer_address" value="{{ S.footer_address }}"></label>
+<h3>التواصل والتوصيل</h3>
+<div class="g3"><label>رقم واتساب (دولي: 201xxxxxxxxx)<input name="whatsapp" value="{{ S.whatsapp }}"></label><label>لينك فيسبوك<input name="facebook" value="{{ S.facebook }}"></label><label>لينك إنستجرام<input name="instagram" value="{{ S.instagram }}"></label></div>
+<div class="g3"><label>تنبيه المخزون القليل (عند كام قطعة)<input name="low_stock_threshold" type="number" min="0" value="{{ S.low_stock_threshold }}"></label><label>لينك تيليجرام<input name="telegram_link" value="{{ S.telegram_link }}"></label><label>مصاريف التوصيل (ج)<input name="delivery_fee" type="number" min="0" value="{{ S.delivery_fee }}"></label></div>
+<h3>إشعار الطلبات على تيليجرام (اختياري)</h3>
+<p class="mut">اعمل بوت من @BotFather وخد التوكن، وابعتله رسالة، وخد الـ chat id بتاعك من @userinfobot. بعدها كل طلب جديد هيوصلك على تيليجرام تفصيلياً.</p>
+<div class="g3"><label>Bot token<input name="telegram_bot_token" value="{{ S.telegram_bot_token }}" autocomplete="off"></label><label>Chat id<input name="telegram_chat_id" value="{{ S.telegram_chat_id }}"></label></div>
+<button class="btn">حفظ الإعدادات</button></form>
+<form method="post" action="{{ url_for('admin.password') }}" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}"><h3>تغيير الباسورد</h3>
+<div class="g3"><label>القديم<input type="password" name="old" required></label><label>الجديد (8+ حروف)<input type="password" name="new" required minlength="8"></label></div>
+<button class="btn">تغيير</button></form>
+<form method="post" action="{{ url_for('admin.backup') }}" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}"><h3>نسخة احتياطية</h3>
+<p class="mut">بتحمل zip فيه الداتا بيس وكل الصور. خد نسخة كل فترة، وممكن تجدولها بأمر python backup.py.</p><button class="btn">تحميل نسخة احتياطية</button></form>
+{% endblock %}

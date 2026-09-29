@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}تتبع طلبك | {{ S.site_name }}{% endblock %}
+{% block content %}
+<section class="pg"><h2>تتبع طلبك</h2>
+<form method="post" class="frm box">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <label>رقم الطلب<input name="order_id" type="number" min="1" value="{{ request.form.get('order_id','') }}" required></label>
+  <label>رقم الموبايل اللي طلبت بيه<input name="phone" inputmode="tel" value="{{ request.form.get('phone','') }}" required></label>
+  <button class="btn" type="submit">تتبع</button>
+</form>
+{% if order %}
+<div class="box">
+  <h3>طلب #{{ order.id }}</h3>
+  {% if order.status == 'cancelled' %}<p class="flash err">الطلب ده اتلغى.</p>
+  {% else %}
+  <div class="tl">{% set ns = namespace(reached=true) %}{% for k,l in statuses %}
+    <div class="ts {{ 'done' if ns.reached }}"><i></i><span>{{ l }}</span></div>
+    {% if k == order.status %}{% set ns.reached = false %}{% endif %}
+  {% endfor %}</div>{% endif %}
+  {% for i in order.items %}<div class="sl"><span>{{ i.name }} {{ i.size }} {{ i.color }} × {{ i.qty }}</span><b>{{ (i.price*i.qty)|money }}</b></div>{% endfor %}
+  <div class="sl"><span>التوصيل</span><b>{{ order.delivery_fee|money }}</b></div>
+  <div class="sl tot"><span>الإجمالي</span><b>{{ order.total|money }} ج</b></div>
+</div>{% endif %}
+</section>
+{% endblock %}

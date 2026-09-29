@@ -1,0 +1,7 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2>الصفحات</h2>
+<p class="mut">دي الصفحات اللي بتظهر في الفوتر (سياسة الاستبدال، عن البراند، تواصل معانا) وجدول المقاسات اللي بيظهر في صفحة كل منتج.</p>
+<div class="card"><table><tr><th>الصفحة</th><th></th></tr>
+{% for pg in pages %}<tr><td>{{ pg.title }}</td><td><a class="btn s o" href="{{ url_for('admin.page_edit', slug=pg.slug) }}">تعديل</a></td></tr>{% endfor %}</table></div>
+{% endblock %}

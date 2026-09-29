@@ -1,0 +1,11 @@
+instance/
+static/uploads/*
+!static/uploads/.gitkeep
+__pycache__/
+*.pyc
+venv/
+.env
+backups/
+reset_admin.py
+CHATBOT_README.md
+*.db

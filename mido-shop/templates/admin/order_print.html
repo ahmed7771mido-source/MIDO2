@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>فاتورة #{{ o.id }}</title>
+<style>
+body{font-family:Cairo,Tahoma,sans-serif;max-width:720px;margin:20px auto;padding:0 16px;color:#000}
+h1{margin:0}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{text-align:right;border-bottom:1px solid #999;padding:6px}
+.tot td{font-weight:800;font-size:18px}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:8px}
+@media print{.np{display:none}}
+</style></head><body>
+<button class="np" onclick="window.print()">طباعة</button>
+<div class="top"><div><h1>{{ S.site_name }}</h1><div>{{ S.footer_address }}</div></div><div>فاتورة / ملصق شحن<br><b>طلب #{{ o.id }}</b><br>{{ o.created_at|dt }}</div></div>
+<p><b>العميل:</b> {{ o.name }}<br><b>التليفون:</b> {{ o.phone }}<br><b>المحافظة:</b> {{ o.governorate }}<br><b>العنوان:</b> {{ o.address }}</p>
+{% if o.notes %}<p><b>ملاحظات:</b> {{ o.notes }}</p>{% endif %}
+<table><tr><th>المنتج</th><th>مقاس/لون</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>
+{% for i in o.items %}<tr><td>{{ i.name }}</td><td>{{ i.size }} {{ i.color }}</td><td>{{ i.qty }}</td><td>{{ i.price|money }}</td><td>{{ (i.price*i.qty)|money }}</td></tr>{% endfor %}
+<tr><td colspan="4">التوصيل</td><td>{{ o.delivery_fee|money }}</td></tr>
+<tr class="tot"><td colspan="4">المطلوب تحصيله عند الاستلام</td><td>{{ o.total|money }} ج</td></tr></table>
+</body></html>

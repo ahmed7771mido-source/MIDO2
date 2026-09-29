@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="ok"><h2>تم استلام طلبك</h2>
+<p>رقم الطلب <b>#{{ o.id }}</b>. هنكلمك على {{ o.phone }} لتأكيد الطلب والتوصيل.</p>
+<div class="box">
+  {% for i in o.items %}<div class="sl"><span>{{ i.name }} {{ i.size }} {{ i.color }} × {{ i.qty }}</span><b>{{ (i.price*i.qty)|money }}</b></div>{% endfor %}
+  <div class="sl"><span>التوصيل</span><b>{{ o.delivery_fee|money }}</b></div>
+  <div class="sl tot"><span>الإجمالي</span><b>{{ o.total|money }} ج</b></div>
+</div>
+<p class="mut">تقدر تتابع حالة الطلب من <a href="{{ url_for('shop.track') }}">تتبع طلبك</a> برقم الطلب والموبايل.</p>
+<a class="btn" href="{{ url_for('shop.index') }}">رجوع للمتجر</a>
+</section>
+{% endblock %}

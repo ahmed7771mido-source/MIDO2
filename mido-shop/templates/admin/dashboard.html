@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>التحليلات</h2>
+  <form method="get"><select name="month" onchange="this.form.submit()">{% for k in keys|reverse %}<option value="{{ k }}" {{ 'selected' if k==sel }}>{{ k }}</option>{% endfor %}</select></form></div>
+<div class="kpis">
+  <div class="kpi"><span>طلبات الشهر</span><b>{{ cur.orders }}</b></div>
+  <div class="kpi"><span>المبيعات</span><b>{{ cur.revenue|money }}</b></div>
+  <div class="kpi"><span>ربح المنتجات</span><b>{{ cur.gross|money }}</b></div>
+  <div class="kpi"><span>المصاريف</span><b>{{ cur.expenses|money }}</b></div>
+  <div class="kpi hi"><span>صافي الربح</span><b>{{ cur.net|money }}</b></div>
+  <div class="kpi"><span>طلبات شغالة دلوقتي</span><b>{{ pending }}</b></div>
+</div>
+{% if low_stock %}<div class="card warn"><h3>مخزون قليل</h3>{% for p in low_stock %}<a href="{{ url_for('admin.product_edit', pid=p.id) }}">{{ p.name }}</a> ({{ p.stock }}){{ '، ' if not loop.last }}{% endfor %}</div>{% endif %}
+<p class="mut">المبيعات والربح محسوبين من الطلبات غير الملغية، والربح = (سعر البيع − التكلفة) × الكمية، من غير رسوم التوصيل. الصافي = الربح − المصاريف المسجلة.</p>
+<div class="cols">
+  <div class="card"><h3>الربح شهرياً</h3><canvas id="c1" height="200"></canvas></div>
+  <div class="card"><h3>الطلبات شهرياً</h3><canvas id="c2" height="200"></canvas></div>
+</div>
+<div class="cols">
+  <div class="card"><h3>الأكتر طلباً في {{ sel }}</h3>
+    {% if top_month %}<table><tr><th>المنتج</th><th>الكمية</th><th>المبيعات</th></tr>{% for n,q,r in top_month %}<tr><td>{{ n }}</td><td>{{ q }}</td><td>{{ r|money }}</td></tr>{% endfor %}</table>{% else %}<p class="mut">لسه مفيش طلبات.</p>{% endif %}</div>
+  <div class="card"><h3>الأكتر طلباً على الإطلاق</h3>
+    {% if top_all %}<table><tr><th>المنتج</th><th>الكمية</th><th>المبيعات</th></tr>{% for n,q,r in top_all %}<tr><td>{{ n }}</td><td>{{ q }}</td><td>{{ r|money }}</td></tr>{% endfor %}</table>{% else %}<p class="mut">لسه مفيش طلبات.</p>{% endif %}</div>
+</div>
+<div class="card"><h3>حالات طلبات {{ sel }}</h3>
+  <table><tr>{% for l,c in status_rows %}<th>{{ l }}</th>{% endfor %}</tr><tr>{% for l,c in status_rows %}<td>{{ c }}</td>{% endfor %}</tr></table></div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+var keys={{ keys|tojson }}, S={{ series|tojson }};
+var f=function(k){return keys.map(function(m){return S[m][k]})};
+Chart.defaults.font.family="Cairo,Tahoma,sans-serif";
+new Chart(document.getElementById("c1"),{type:"bar",data:{labels:keys,datasets:[
+ {label:"ربح المنتجات",data:f("gross"),backgroundColor:"#8A2A3E"},
+ {label:"المصاريف",data:f("expenses"),backgroundColor:"#999"},
+ {label:"الصافي",data:f("net"),type:"line",borderColor:"#2e8b57",backgroundColor:"#2e8b57"}]}});
+new Chart(document.getElementById("c2"),{type:"bar",data:{labels:keys,datasets:[{label:"الطلبات",data:f("orders"),backgroundColor:"#8A2A3E"}]},options:{scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+</script>
+{% endblock %}

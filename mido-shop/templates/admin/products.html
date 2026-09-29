@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>المنتجات</h2><a class="btn" href="{{ url_for('admin.product_new') }}">+ منتج جديد</a></div>
+<div class="card scroll"><table>
+<tr><th></th><th>المنتج</th><th>القسم</th><th>السعر</th><th>التكلفة</th><th>المخزون</th><th>الحالة</th><th></th></tr>
+{% for p in products %}<tr>
+<td>{% if p.main_image %}<img class="tn" src="{{ url_for('static', filename='uploads/' ~ p.main_image) }}" alt="">{% endif %}</td>
+<td><a href="{{ url_for('admin.product_edit', pid=p.id) }}">{{ p.name }}</a></td><td>{{ p.category.name }}</td>
+<td>{{ p.price|money }}{% if p.on_sale %} <small>(عرض {{ p.sale_price|money }})</small>{% endif %}</td><td>{{ p.cost|money }}</td>
+<td class="{{ 'lowst' if p.stock is not none and p.stock <= 3 }}">{{ 'غير محدود' if p.stock is none else p.stock }}</td><td>{{ 'ظاهر' if p.active else 'مخفي' }}</td>
+<td><form method="post" action="{{ url_for('admin.product_delete', pid=p.id) }}" onsubmit="return confirm('مسح المنتج؟')"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="ghost">مسح</button></form></td></tr>
+{% else %}<tr><td colspan="8" class="mut">لسه مفيش منتجات. اضغط "منتج جديد".</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

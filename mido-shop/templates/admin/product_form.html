@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>{{ 'تعديل: ' ~ p.name if p else 'منتج جديد' }}</h2><a class="btn s o" href="{{ url_for('admin.products') }}">رجوع</a></div>
+<form method="post" enctype="multipart/form-data" class="card frm">
+<input type="hidden" name="csrf" value="{{ csrf }}">
+<label>اسم المنتج<input name="name" value="{{ p.name if p }}" required></label>
+<label>القسم<select name="category_id">{% for c in cats %}<option value="{{ c.id }}" {{ 'selected' if p and p.category_id==c.id }}>{{ c.name }}</option>{% endfor %}</select></label>
+<label>الوصف<textarea name="description" rows="4">{{ p.description if p }}</textarea></label>
+<div class="g3">
+<label>سعر البيع<input type="number" min="0" name="price" value="{{ p.price if p }}" required></label>
+<label>سعر العرض (اختياري)<input type="number" min="0" name="sale_price" value="{{ p.sale_price if p and p.sale_price }}"></label>
+<label>التكلفة عليك<input type="number" min="0" name="cost" value="{{ p.cost if p else 0 }}" required></label>
+</div>
+<div class="g3">
+<label>المخزون (فاضي = غير محدود)<input type="number" min="0" name="stock" value="{{ p.stock if p and p.stock is not none }}"></label>
+<label>المقاسات (بفاصلة)<input name="sizes" value="{{ p.sizes if p else 'M,L,XL,XXL' }}"></label>
+<label>الألوان (بفاصلة)<input name="colors" value="{{ p.colors if p }}" placeholder="أسود,برجندي,رمادي"></label>
+</div>
+<div class="inl"><label class="chk"><input type="checkbox" name="active" {{ 'checked' if not p or p.active }}> ظاهر في الموقع</label>
+<label class="chk"><input type="checkbox" name="featured" {{ 'checked' if p and p.featured }}> منتج مميز (الصفحة الرئيسية)</label></div>
+<label>رفع صور (تقدر تختار أكتر من صورة)<input type="file" name="images" accept="image/png,image/jpeg,image/webp" multiple></label>
+<button class="btn">حفظ</button>
+</form>
+{% if p and p.images %}
+<div class="card"><h3>صور المنتج</h3><div class="imgs">
+{% for im in p.images %}<div class="im"><img src="{{ url_for('static', filename='uploads/' ~ im.filename) }}" alt="">
+<div class="inl">{% if loop.index > 1 %}<form method="post" action="{{ url_for('admin.image_main', iid=im.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="ghost">رئيسية</button></form>{% else %}<small>الرئيسية</small>{% endif %}
+<form method="post" action="{{ url_for('admin.image_delete', iid=im.id) }}" onsubmit="return confirm('مسح الصورة؟')"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="ghost">مسح</button></form></div></div>{% endfor %}
+</div></div>{% endif %}
+{% endblock %}

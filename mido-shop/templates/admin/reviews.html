@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2>التقييمات</h2>
+<p class="mut">أي تقييم جديد بيستنى موافقتك قبل ما يظهر في الموقع.</p>
+{% for r in items %}
+<div class="card {{ '' if r.approved else 'warn' }}">
+  <div class="bar"><div><b>{{ r.name }}</b> · {{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }} · <a href="{{ url_for('shop.product', pid=r.product_id) }}" target="_blank">{{ r.product.name }}</a> <span class="mut">{{ r.created_at|dt }}</span></div>
+  <span class="st {{ 'delivered' if r.approved else 'new' }}">{{ 'ظاهر' if r.approved else 'في الانتظار' }}</span></div>
+  <p>{{ r.comment }}</p>
+  {% if r.photo %}<img class="tn" style="width:90px;height:90px" src="{{ url_for('static', filename='uploads/' ~ r.photo) }}" alt="">{% endif %}
+  <form method="post" action="{{ url_for('admin.review_update', rid=r.id) }}" class="inl"><input type="hidden" name="csrf" value="{{ csrf }}">
+    {% if r.approved %}<button class="btn s o" name="approve" value="0">إخفاء</button>{% else %}<button class="btn s" name="approve" value="1">موافقة</button>{% endif %}
+    <button class="btn s danger" name="delete" value="1" onclick="return confirm('مسح التقييم؟')">مسح</button></form>
+</div>
+{% else %}<p class="mut">مفيش تقييمات.</p>{% endfor %}
+{% endblock %}

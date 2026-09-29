@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2>رسوم التوصيل حسب المنطقة</h2>
+<p class="mut">لو ضفت مناطق هنا، العميل هيختار محافظته من قائمة ورسوم التوصيل هتتحسب تلقائي. أي حد يختار "محافظة أخرى" بياخد الرسوم الافتراضية من إعدادات الموقع. لو القائمة فاضية، العميل بيكتب المحافظة بإيده والرسوم الافتراضية بتتطبق.</p>
+{% for z in zones %}<form id="zf{{ z.id }}" method="post" action="{{ url_for('admin.zone_update', zid=z.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"></form>{% endfor %}
+<div class="card scroll"><table><tr><th>المنطقة</th><th>الرسوم (ج)</th><th>الترتيب</th><th></th></tr>
+{% for z in zones %}<tr>
+<td><input form="zf{{ z.id }}" name="name" value="{{ z.name }}"></td>
+<td><input form="zf{{ z.id }}" name="fee" type="number" min="0" value="{{ z.fee }}" class="qty"></td>
+<td><input form="zf{{ z.id }}" name="position" type="number" value="{{ z.position }}" class="qty"></td>
+<td class="inl"><button form="zf{{ z.id }}" class="btn s">حفظ</button><button form="zf{{ z.id }}" class="btn s danger" name="delete" value="1" onclick="return confirm('مسح؟')">مسح</button></td></tr>
+{% else %}<tr><td colspan="4" class="mut">مفيش مناطق.</td></tr>{% endfor %}</table></div>
+<form method="post" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}"><h3>منطقة جديدة</h3>
+<div class="g3"><label>الاسم (مثلاً: بني سويف)<input name="name" required></label><label>الرسوم<input name="fee" type="number" min="0" required></label><label>الترتيب<input name="position" type="number" value="0"></label></div>
+<button class="btn">إضافة</button></form>
+{% endblock %}

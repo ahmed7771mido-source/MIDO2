@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block title %}{{ p.name }} | {{ S.site_name }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ p.name }} | {{ S.site_name }}{% endblock %}
+{% block og_desc %}{{ p.name }} بسعر {{ p.current_price|money }} ج. {{ (p.description or S.tagline)[:120] }}{% endblock %}
+{% block og_image %}{% if p.main_image %}{{ url_for('static', filename='uploads/' ~ p.main_image, _external=True) }}{% else %}{{ url_for('static', filename='img/og-default.png', _external=True) }}{% endif %}{% endblock %}
+{% block content %}
+<section class="pd">
+  <div class="gal">
+    {% if p.images %}
+      <img id="mainimg" src="{{ url_for('static', filename='uploads/' ~ p.images[0].filename) }}" alt="{{ p.name }}">
+      {% if p.images|length > 1 %}<div class="th">{% for im in p.images %}
+        <img src="{{ url_for('static', filename='uploads/' ~ im.filename) }}" alt="" data-full="{{ url_for('static', filename='uploads/' ~ im.filename) }}">
+      {% endfor %}</div>{% endif %}
+    {% else %}<div class="noimg big">{{ p.name }}</div>{% endif %}
+  </div>
+  <div class="info">
+    <div class="mut">{{ p.category.name }}</div>
+    <h1>{{ p.name }}</h1>
+    {% if p.avg_rating %}<a class="stars" href="#reviews">{{ '★' * (p.avg_rating|round|int) }}{{ '☆' * (5 - (p.avg_rating|round|int)) }} <span class="mut">({{ p.approved_reviews|length }})</span></a>{% endif %}
+    <div class="pp big">{{ p.current_price|money }} ج {% if p.on_sale %}<s>{{ p.price|money }}</s>{% endif %}</div>
+    {% if p.description %}<p class="desc">{{ p.description }}</p>{% endif %}
+    {% if p.in_stock %}
+    <form method="post" action="{{ url_for('shop.cart_add') }}" id="addf">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="pid" value="{{ p.id }}">
+      <input type="hidden" name="size" id="fsize">
+      <input type="hidden" name="color" id="fcolor">
+      {% if p.size_list %}<div class="opt"><b>المقاس</b><div class="chips" data-target="fsize">{% for s in p.size_list %}<button type="button">{{ s }}</button>{% endfor %}</div></div>{% endif %}
+      {% if p.color_list %}<div class="opt"><b>اللون</b><div class="chips" data-target="fcolor">{% for s in p.color_list %}<button type="button">{{ s }}</button>{% endfor %}</div></div>{% endif %}
+      <div class="opt"><b>الكمية</b> <input type="number" name="qty" value="1" min="1" max="10" class="qty"></div>
+      <button class="btn" type="submit">أضف للسلة</button>
+      <button class="btn o" type="submit" name="buy" value="1">اطلب دلوقتي</button>
+    </form>
+    {% if p.stock is not none and p.stock <= 5 %}<p class="mut">متبقي {{ p.stock }} قطعة بس.</p>{% endif %}
+    {% else %}<p class="flash err">المنتج ده خلص حالياً.</p>{% endif %}
+    {% if size_page and size_page.body %}<details class="sg"><summary>{{ size_page.title }}</summary>{{ size_page.body|richtext }}</details>{% endif %}
+    <p><a href="{{ url_for('shop.page', slug='returns') }}" class="mut">سياسة الاستبدال والاسترجاع</a></p>
+  </div>
+</section>
+
+<section id="reviews"><h2>التقييمات</h2>
+{% for r in p.approved_reviews %}
+<div class="rv"><div><b>{{ r.name }}</b> <span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span></div>
+<p>{{ r.comment }}</p>
+{% if r.photo %}<img src="{{ url_for('static', filename='uploads/' ~ r.photo) }}" alt="" loading="lazy">{% endif %}</div>
+{% else %}<p class="mut">مفيش تقييمات لسه. كون أول واحد يقيّم.</p>{% endfor %}
+<details class="sg"><summary>أضف تقييمك</summary>
+<form method="post" action="{{ url_for('shop.review', pid=p.id) }}" enctype="multipart/form-data" class="frm">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <label>اسمك<input name="name" maxlength="60" required></label>
+  <label>التقييم<select name="rating"><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select></label>
+  <label>تعليقك<textarea name="comment" rows="3" maxlength="600" required></textarea></label>
+  <label>صورة (اختياري)<input type="file" name="photo" accept="image/png,image/jpeg,image/webp"></label>
+  <button class="btn" type="submit">إرسال</button>
+</form></details>
+</section>
+{% if related %}<section><h2>ممكن يعجبك</h2><div class="grid">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>{% endif %}
+{% endblock %}

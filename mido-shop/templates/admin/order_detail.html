@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>طلب #{{ o.id }} <span class="st {{ o.status }}">{{ o.status_label }}</span></h2><div class="inl"><a class="btn s o" target="_blank" href="{{ url_for('admin.order_print', oid=o.id) }}">طباعة فاتورة</a><a class="btn s o" href="{{ url_for('admin.orders') }}">رجوع</a></div></div>
+<div class="cols">
+<div class="card"><h3>بيانات العميل</h3>
+<p><b>الاسم:</b> {{ o.name }}<br><b>التليفون:</b> <a href="tel:{{ o.phone }}">{{ o.phone }}</a> · <a target="_blank" rel="noopener" href="https://wa.me/2{{ o.phone }}">واتساب</a><br>
+<b>المنطقة:</b> {{ o.governorate }}<br><b>العنوان:</b> {{ o.address }}<br><b>الوقت:</b> {{ o.created_at|dt }}</p>
+{% if o.notes %}<p><b>ملاحظات العميل:</b> {{ o.notes }}</p>{% endif %}</div>
+<div class="card"><h3>المنتجات</h3><table>
+<tr><th>المنتج</th><th>مقاس/لون</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>
+{% for i in o.items %}<tr><td>{{ i.name }}</td><td>{{ i.size }} {{ i.color }}</td><td>{{ i.qty }}</td><td>{{ i.price|money }}</td><td>{{ (i.price*i.qty)|money }}</td></tr>{% endfor %}
+<tr><td colspan="4">التوصيل</td><td>{{ o.delivery_fee|money }}</td></tr>
+<tr class="tot"><td colspan="4">الإجمالي المطلوب من العميل</td><td>{{ o.total|money }}</td></tr>
+<tr><td colspan="4" class="mut">ربح الطلب</td><td class="mut">{{ o.profit|money }}</td></tr></table></div>
+</div>
+<form method="post" class="card">
+<input type="hidden" name="csrf" value="{{ csrf }}">
+<h3>تحديث الطلب</h3>
+<div class="inl"><select name="status">{% for k,l in STATUSES %}<option value="{{ k }}" {{ 'selected' if k==o.status }}>{% if k=='new' %}🔔{% elif k=='confirmed' %}✅{% elif k=='shipping' %}🚚{% elif k=='delivered' %}📦{% elif k=='cancelled' %}❌{% endif %} {{ l }}</option>{% endfor %}</select></div>
+<label>ملاحظة داخلية<textarea name="admin_note" rows="2">{{ o.admin_note }}</textarea></label>
+<button class="btn">حفظ</button>
+</form>
+<form method="post" action="{{ url_for('admin.order_delete', oid=o.id) }}" onsubmit="return confirm('مسح الطلب نهائياً؟')">
+<input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn danger s">مسح الطلب</button></form>
+{% endblock %}

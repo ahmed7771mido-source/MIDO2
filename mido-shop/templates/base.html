@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>{% block title %}{{ S.site_name }} | {{ S.tagline }}{% endblock %}</title>
+  <meta name="description" content="{% block og_desc %}{{ S.hero_text }}{% endblock %}">
+  <meta property="og:site_name" content="{{ S.site_name }}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ S.site_name }} | {{ S.tagline }}{% endblock %}">
+  <meta property="og:description" content="{{ self.og_desc() }}">
+  <meta property="og:image"
+    content="{% block og_image %}{{ url_for('static', filename='img/og-default.png', _external=True) }}{% endblock %}">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:locale" content="ar_AR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+
+<body>
+  {% if S.announcement %}<div class="ann">{{ S.announcement }}</div>{% endif %}
+  <header class="hd">
+    <div class="w hdi">
+      <a class="logo" href="{{ url_for('shop.index') }}">
+        <svg width="32" height="32" viewBox="0 0 80 80" aria-hidden="true">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect x="3" y="3" width="74" height="74" rx="12" fill="none" stroke="url(#logoGradient)" stroke-width="5" />
+          <polyline points="20,58 20,24 40,46 60,24 60,58" fill="none" stroke="url(#logoGradient)" stroke-width="7"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {{ S.site_name }}
+      </a>
+      <nav id="nav">
+        <a href="{{ url_for('shop.index') }}">الرئيسية</a>
+        {% for c in nav_categories %}<a href="{{ url_for('shop.category', slug=c.slug) }}">{{ c.name }}</a>{% endfor %}
+        <a class="offer" href="{{ url_for('shop.offers') }}">العروض</a>
+        <form action="{{ url_for('shop.search') }}" class="sf"><input name="q" placeholder="ابحث" aria-label="بحث">
+        </form>
+      </nav>
+      <div class="hsoc">
+        {% if S.whatsapp %}<a href="https://wa.me/{{ S.whatsapp }}" target="_blank" rel="noopener"
+          aria-label="واتساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" />
+            <path d="M9 8c0 4 3 7 7 7l1-2-2.5-1-1 1c-1.3-.5-2.5-1.7-3-3l1-1L10 7z" fill="currentColor" stroke="none" />
+          </svg></a>{% endif %}
+        {% if S.facebook %}<a href="{{ S.facebook }}" target="_blank" rel="noopener" aria-label="فيسبوك"><svg
+            viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 8V6.5c0-.7.3-1 1-1h2V2h-3c-2.8 0-4 1.7-4 4v2H7.5v3.5H10V22h4v-10.5h2.8L17.5 8z" />
+          </svg></a>{% endif %}
+        {% if S.instagram %}<a href="{{ S.instagram }}" target="_blank" rel="noopener" aria-label="إنستجرام"><svg
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17" cy="7" r="1" fill="currentColor" stroke="none" />
+          </svg></a>{% endif %}
+        {% if S.telegram_link %}<a href="{{ S.telegram_link }}" target="_blank" rel="noopener"
+          aria-label="تيليجرام"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linejoin="round">
+            <path d="M21 4L3 11l5.5 2L10 19l3-4 5 4z" />
+            <path d="M8.5 13L21 4" />
+          </svg></a>{% endif %}
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع">🌙</button>
+      <a class="cartb" href="{{ url_for('shop.cart') }}">السلة <b>{{ cart_count }}</b></a>
+      <button class="burger" id="burger" aria-label="القائمة">☰</button>
+    </div>
+  </header>
+  <div class="w">
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{%
+    endfor %}
+  </div>
+  <main class="w">{% block content %}{% endblock %}</main>
+  <footer class="ft">
+    <div class="w">
+      <div class="fl">
+        {% for pg in footer_pages %}<a href="{{ url_for('shop.page', slug=pg.slug) }}">{{ pg.title }}</a>{% endfor %}
+        <a href="{{ url_for('shop.track') }}">تتبع طلبك</a>
+      </div>
+      <p>{{ S.site_name }} · {{ S.footer_address }}</p>
+    </div>
+  </footer>
+
+  <!-- ========== AI Chatbot ========== -->
+  <button id="chatbot-btn" aria-label="المساعد الذكي">💬<div class="chat-dot">1</div></button>
+
+  <div id="chatbot-panel">
+    <div class="cb-head">
+      <div class="cb-head-info">
+        <div class="cb-avatar">🤖</div>
+        <div>
+          <div class="cb-head-title">المساعد الذكي</div>
+          <div class="cb-head-sub">● متصل الآن</div>
+        </div>
+      </div>
+      <button class="cb-close-btn" id="cb-close">✕</button>
+    </div>
+    <div class="cb-msgs" id="cb-msgs">
+      <div class="cb-msg bot">
+        <div class="cb-msg-av">🤖</div>
+        <div class="cb-msg-txt">
+          مرحباً بك! 👋<br><br>
+          أنا المساعد الذكي، يسعدني مساعدتك في أي سؤال عن متجرنا.<br><br>
+          ممكن أساعدك في:<br>
+          <ul>
+            <li>🏷️ الأسعار والمنتجات</li>
+            <li>📏 اختيار المقاس</li>
+            <li>🚚 معلومات التوصيل</li>
+            <li>🔄 الاستبدال والإرجاع</li>
+            <li>🎁 العروض والخصومات</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="cb-quick">
+      <button class="cb-quick-btn" onclick="cbQuick('الأسعار والمنتجات')">🏷️ الأسعار</button>
+      <button class="cb-quick-btn" onclick="cbQuick('جدول المقاسات')">📏 المقاسات</button>
+      <button class="cb-quick-btn" onclick="cbQuick('رسوم التوصيل')">🚚 التوصيل</button>
+      <button class="cb-quick-btn" onclick="cbQuick('سياسة الاستبدال')">🔄 الاستبدال</button>
+      <button class="cb-quick-btn" onclick="cbQuick('العروض المتاحة')">🎁 العروض</button>
+    </div>
+    <form class="cb-form" id="cb-form">
+      <input type="text" id="cb-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
+      <button type="submit" class="cb-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+        </svg>
+      </button>
+    </form>
+  </div>
+  <!-- ========== End Chatbot ========== -->
+
+  <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

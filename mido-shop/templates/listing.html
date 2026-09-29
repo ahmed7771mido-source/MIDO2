@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block title %}{{ title }} | {{ S.site_name }}{% endblock %}
+{% block content %}
+<section>
+  <div class="row"><h2>{{ title }}</h2>
+  {% if sort %}<div class="sort">
+    <a href="?sort=new" class="{{ 'on' if sort=='new' }}">الأحدث</a>
+    <a href="?sort=low" class="{{ 'on' if sort=='low' }}">الأرخص</a>
+    <a href="?sort=high" class="{{ 'on' if sort=='high' }}">الأغلى</a>
+  </div>{% endif %}</div>
+  {% if products %}<div class="grid">{% for p in products %}{{ card(p) }}{% endfor %}</div>
+  {% else %}<p class="mut">مفيش منتجات هنا حالياً.</p>{% endif %}
+</section>
+{% endblock %}

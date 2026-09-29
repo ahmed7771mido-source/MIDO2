@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2>الأقسام (بتظهر في الناف بار)</h2>
+{% for c in cats %}<form id="cf{{ c.id }}" method="post" action="{{ url_for('admin.category_update', cid=c.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"></form>{% endfor %}
+<div class="card scroll"><table><tr><th>الاسم</th><th>الترتيب</th><th></th></tr>
+{% for c in cats %}<tr>
+<td><input form="cf{{ c.id }}" name="name" value="{{ c.name }}"></td><td><input form="cf{{ c.id }}" name="position" type="number" value="{{ c.position }}" class="qty"></td>
+<td class="inl"><button form="cf{{ c.id }}" class="btn s">حفظ</button><button form="cf{{ c.id }}" class="btn s danger" name="delete" value="1" onclick="return confirm('مسح القسم؟')">مسح</button></td></tr>{% endfor %}
+</table></div>
+<form method="post" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}"><h3>قسم جديد</h3>
+<div class="g3"><label>الاسم<input name="name" required></label><label>الرابط بالإنجليزي (اختياري)<input name="slug" placeholder="shoes"></label><label>الترتيب<input name="position" type="number" value="0"></label></div>
+<button class="btn">إضافة</button></form>
+{% endblock %}

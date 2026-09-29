@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}لوحة التحكم{% endblock %} | {{ S.site_name }}</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+
+<body data-last="{{ last_order_id or 0 }}" data-csrf="{{ csrf }}" data-poll="{{ url_for('admin.api_new') }}"
+  data-orders="{{ url_for('admin.orders') }}">
+  {% if session.admin_id %}
+  <header class="top">
+    <b class="brand">{{ S.site_name }} · Admin</b>
+    <nav>
+      <a href="{{ url_for('admin.dashboard') }}">التحليلات</a>
+      <a href="{{ url_for('admin.orders') }}">الطلبات <span class="nb" id="nb" {% if not unseen %}hidden{% endif %}>{{
+          unseen }}</span></a>
+      <a href="{{ url_for('admin.products') }}">المنتجات</a>
+      <a href="{{ url_for('admin.offers') }}">العروض</a>
+      <a href="{{ url_for('admin.categories') }}">الأقسام</a>
+      <a href="{{ url_for('admin.customers') }}">العملاء</a>
+      <a href="{{ url_for('admin.reviews') }}">التقييمات{% if pending_reviews %} <span class="nb">{{ pending_reviews
+          }}</span>{% endif %}</a>
+      <a href="{{ url_for('admin.expenses') }}">المصاريف</a>
+      <a href="{{ url_for('admin.zones') }}">التوصيل</a>
+      <a href="{{ url_for('admin.pages') }}">الصفحات</a>
+      <a href="{{ url_for('admin.settings') }}">إعدادات الموقع</a>
+      <a href="{{ url_for('shop.index') }}" target="_blank">فتح الموقع</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" title="تبديل الوضع">🌙</button>
+    <form method="post" action="{{ url_for('admin.logout') }}"><input type="hidden" name="csrf"
+        value="{{ csrf }}"><button class="ghost">خروج</button></form>
+  </header>
+  {% endif %}
+  <main>
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{%
+    endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toast" hidden></div>
+  {% if session.admin_id %}
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>{% endif %}
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

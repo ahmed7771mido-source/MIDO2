@@ -1,0 +1,12 @@
+{% macro card(p) %}
+<a class="pc" href="{{ url_for('shop.product', pid=p.id) }}">
+  <div class="pi">
+    {% if p.main_image %}<img loading="lazy" src="{{ url_for('static', filename='uploads/' ~ p.main_image) }}" alt="{{ p.name }}">
+    {% else %}<div class="noimg">{{ p.name }}</div>{% endif %}
+    {% if p.on_sale %}<span class="badge">خصم</span>{% endif %}
+    {% if not p.in_stock %}<span class="badge out">خلص</span>{% endif %}
+  </div>
+  <h3>{{ p.name }}</h3>
+  <div class="pp">{{ p.current_price|money }} ج {% if p.on_sale %}<s>{{ p.price|money }}</s>{% endif %}</div>
+</a>
+{% endmacro %}

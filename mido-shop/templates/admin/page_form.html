@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>تعديل: {{ pg.title }}</h2><a class="btn s o" href="{{ url_for('admin.pages') }}">رجوع</a></div>
+<form method="post" class="card frm"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>العنوان<input name="title" value="{{ pg.title }}" required></label>
+<label>المحتوى<textarea name="body" rows="12">{{ pg.body }}</textarea></label>
+<p class="mut">كل سطر فقرة. لعمل جدول اكتب الأعمدة بينها العلامة | والسطر الأول بيبقى عناوين الأعمدة، مثال:<br><code>المقاس | الصدر | الطول</code><br><code>M | 54 | 68</code></p>
+<button class="btn">حفظ</button></form>
+{% endblock %}

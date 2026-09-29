@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block content %}
+<section class="hero">
+  <h1>{{ S.hero_title }}</h1>
+  <p>{{ S.hero_text }}</p>
+  <a class="btn" href="{{ url_for('shop.offers') }}">شوف العروض</a>
+  {% if nav_categories %}<a class="btn o" href="{{ url_for('shop.category', slug=nav_categories[0].slug) }}">{{ nav_categories[0].name }}</a>{% endif %}
+</section>
+{% if offers %}<section><h2>عروض</h2><div class="grid">{% for p in offers %}{{ card(p) }}{% endfor %}</div></section>{% endif %}
+{% if featured %}<section><h2>المميز</h2><div class="grid">{% for p in featured %}{{ card(p) }}{% endfor %}</div></section>{% endif %}
+<section><h2>وصل حديثاً</h2>
+  {% if latest %}<div class="grid">{% for p in latest %}{{ card(p) }}{% endfor %}</div>
+  {% else %}<p class="mut">المنتجات هتظهر هنا أول ما تضيفها من لوحة التحكم.</p>{% endif %}
+</section>
+<section><div class="about"><p>{{ S.about_text }}</p></div></section>
+{% endblock %}

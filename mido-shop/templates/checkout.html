@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}إتمام الطلب | {{ S.site_name }}{% endblock %}
+{% block content %}
+<section class="co">
+  <h2>إتمام الطلب</h2>
+  <div class="cols">
+    <form method="post" class="frm" id="checkout-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label>الاسم<input name="name" value="{{ form.get('name','') }}" required></label>
+
+      <label>رقم الموبايل
+        <input name="phone" id="phone-input" inputmode="numeric" value="{{ form.get('phone','') }}"
+          placeholder="01xxxxxxxxx" required maxlength="11" autocomplete="tel">
+        <span id="phone-hint" class="phone-hint"></span>
+      </label>
+
+      {% if zones %}
+      <label>المحافظة / المنطقة
+        <select name="governorate" id="gov" data-default="{{ default_fee }}" required>
+          <option value="" data-fee="{{ default_fee }}">اختار...</option>
+          {% for z in zones %}
+          <option value="{{ z.name }}" data-fee="{{ z.fee }}" {{ 'selected' if form.get('governorate')==z.name }}>{{
+            z.name }}</option>
+          {% endfor %}
+          <option value="{{ other_gov }}" data-fee="{{ default_fee }}" {{ 'selected' if
+            form.get('governorate')==other_gov }}>{{ other_gov }}</option>
+        </select>
+      </label>
+      {% else %}
+      <label>المحافظة / المنطقة
+        <input name="governorate" id="gov" data-default="{{ default_fee }}" value="{{ form.get('governorate','') }}"
+          required>
+      </label>
+      {% endif %}
+
+      <label>العنوان بالتفصيل<textarea name="address" rows="3" required>{{ form.get('address','') }}</textarea></label>
+      <label>ملاحظات (اختياري)<textarea name="notes" rows="2">{{ form.get('notes','') }}</textarea></label>
+      <p class="mut">الدفع عند الاستلام.</p>
+      <button class="btn" type="submit">تأكيد الطلب</button>
+    </form>
+
+    <aside class="box" id="sum" data-sub="{{ subtotal }}">
+      <h3>ملخص الطلب</h3>
+      {% for l in lines %}
+      <div class="sl"><span>{{ l.p.name }} {{ l.size }} {{ l.color }} × {{ l.qty }}</span><b>{{ l.total|money }}</b>
+      </div>
+      {% endfor %}
+      <div class="sl"><span>التوصيل</span><b id="feeval">{{ fee|money }}</b></div>
+      <div class="sl tot"><span>الإجمالي</span><b><span id="totval">{{ (subtotal + fee)|money }}</span> ج</b></div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .phone-hint {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 6px;
+    min-height: 22px;
+    transition: all 0.3s ease;
+  }
+
+  .phone-hint.err {
+    color: #ef4444;
+  }
+
+  .phone-hint.ok {
+    color: #10b981;
+  }
+
+  #phone-input.input-err {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .15) !important;
+  }
+
+  #phone-input.input-ok {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, .15) !important;
+  }
+</style>
+
+<script>
+  (function () {
+    var inp = document.getElementById('phone-input');
+    var hint = document.getElementById('phone-hint');
+    var form = document.getElementById('checkout-form');
+
+    function checkPhone(val) {
+      var digits = val.replace(/\D/g, '');
+      if (digits.length === 0) return { ok: false, msg: '' };
+      if (digits.length < 11) return { ok: false, msg: '⚠️ الرقم ناقص — المطلوب 11 رقم بالظبط' };
+      if (digits.length > 11) return { ok: false, msg: '⚠️ الرقم زيادة — المطلوب 11 رقم بالظبط' };
+      if (!/^01[0125]\d{8}$/.test(digits))
+        return { ok: false, msg: '⚠️ رقم مش صحيح — لازم يبدأ بـ 010 أو 011 أو 012 أو 015' };
+      return { ok: true, msg: '✅ الرقم صحيح' };
+    }
+
+    function applyState(res) {
+      hint.textContent = res.msg;
+      if (res.msg === '') {
+        hint.className = 'phone-hint';
+        inp.classList.remove('input-ok', 'input-err');
+      } else if (res.ok) {
+        hint.className = 'phone-hint ok';
+        inp.classList.add('input-ok');
+        inp.classList.remove('input-err');
+      } else {
+        hint.className = 'phone-hint err';
+        inp.classList.add('input-err');
+        inp.classList.remove('input-ok');
+      }
+    }
+
+    // أرقام فقط
+    inp.addEventListener('keypress', function (e) {
+      if (e.key && !/[0-9]/.test(e.key) &&
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    // تحقق لحظي
+    inp.addEventListener('input', function () {
+      var digits = this.value.replace(/\D/g, '');
+      if (digits.length > 11) digits = digits.slice(0, 11);
+      this.value = digits;
+      applyState(checkPhone(digits));
+    });
+
+    // منع الإرسال لو الرقم غلط
+    form.addEventListener('submit', function (e) {
+      var res = checkPhone(inp.value);
+      if (!res.ok) {
+        e.preventDefault();
+        if (!res.msg) res.msg = '⚠️ اكتب رقم موبايل صحيح (11 رقم)';
+        applyState(res);
+        inp.focus();
+        inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  })();
+</script>
+{% endblock %}

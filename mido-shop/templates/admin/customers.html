@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="bar"><h2>العملاء</h2><div class="inl">
+<a class="btn s {{ '' if repeat else 'o' }}" href="{{ url_for('admin.customers') }}">الكل</a>
+<a class="btn s {{ 'o' if not repeat else '' }}" href="{{ url_for('admin.customers', repeat=1) }}">المتكررين</a>
+<a class="btn s o" href="{{ url_for('admin.export_customers') }}">تصدير Excel</a></div></div>
+<div class="card scroll"><table>
+<tr><th>الاسم</th><th>التليفون</th><th>المحافظة</th><th>عدد الطلبات</th><th>إجمالي الشراء</th><th>آخر طلب</th></tr>
+{% for r in rows %}<tr><td>{{ r.name }}</td><td><a target="_blank" rel="noopener" href="https://wa.me/2{{ r.phone }}">{{ r.phone }}</a></td><td>{{ r.gov }}</td><td>{{ r.orders }}</td><td>{{ r.total|money }}</td><td>{{ r.last|dt('%Y-%m-%d') }}</td></tr>
+{% else %}<tr><td colspan="6" class="mut">مفيش عملاء لسه.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

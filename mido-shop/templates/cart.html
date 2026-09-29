@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}السلة | {{ S.site_name }}{% endblock %}
+{% block content %}
+<section><h2>السلة</h2>
+{% if lines %}
+<div class="tbl">
+{% for l in lines %}
+<div class="cl">
+  <div class="cn"><a href="{{ url_for('shop.product', pid=l.p.id) }}">{{ l.p.name }}</a>
+    <div class="mut">{{ l.size }} {{ l.color }}</div></div>
+  <form method="post" action="{{ url_for('shop.cart_update') }}" class="cq">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="idx" value="{{ l.idx }}">
+    <input type="number" name="qty" value="{{ l.qty }}" min="1" max="10" class="qty">
+    <button class="btn s o" type="submit">تحديث</button>
+    <button class="btn s o" type="submit" name="remove" value="1">حذف</button>
+  </form>
+  <div class="ct">{{ l.total|money }} ج</div>
+</div>
+{% endfor %}
+</div>
+<div class="sum"><span>المجموع</span><b>{{ subtotal|money }} ج</b></div>
+<a class="btn" href="{{ url_for('shop.checkout') }}">كمّل الطلب</a>
+{% else %}<p class="mut">السلة فاضية.</p><a class="btn" href="{{ url_for('shop.index') }}">كمّل تسوق</a>{% endif %}
+</section>
+{% endblock %}

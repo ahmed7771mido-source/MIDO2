@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ pg.title }} | {{ S.site_name }}{% endblock %}
+{% block og_title %}{{ pg.title }} | {{ S.site_name }}{% endblock %}
+{% block og_desc %}{{ pg.body[:120] }}{% endblock %}
+{% block content %}
+<section class="pg"><h2>{{ pg.title }}</h2>
+<div class="about">{{ pg.body|richtext }}</div>
+{% if pg.slug == 'contact' %}
+<div class="soc">
+  {% if S.whatsapp %}<a href="https://wa.me/{{ S.whatsapp }}" target="_blank" rel="noopener">واتساب</a>{% endif %}
+  {% if S.facebook %}<a href="{{ S.facebook }}" target="_blank" rel="noopener">فيسبوك</a>{% endif %}
+  {% if S.instagram %}<a href="{{ S.instagram }}" target="_blank" rel="noopener">إنستجرام</a>{% endif %}
+  {% if S.telegram_link %}<a href="{{ S.telegram_link }}" target="_blank" rel="noopener">تيليجرام</a>{% endif %}
+</div>
+<p class="mut">{{ S.footer_address }}</p>
+{% endif %}
+</section>
+{% endblock %}

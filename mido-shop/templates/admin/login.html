@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<form method="post" class="card login">
+  <h2>دخول الأدمن</h2>
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <label>اسم المستخدم<input name="username" autocomplete="username" required autofocus></label>
+  <label>الباسورد<input name="password" type="password" autocomplete="current-password" required></label>
+  <button class="btn">دخول</button>
+</form>
+{% endblock %}
